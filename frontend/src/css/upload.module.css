@@ -1,0 +1,33 @@
+.container {
+    margin-top: 10px;
+    background-color: #ffffff;
+    margin-bottom: 10px;
+  }
+  
+  .topExplanation {
+    margin-top: 10px;
+  }
+  
+  .fab {
+    margin-left: auto;
+    margin-right: 10px;
+  }
+  
+  .topBox {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .UploadHeader {
+    font-weight: 600;
+  }
+  
+  .UploadDiv {
+    min-height: 364px;
+  }
+
+  .paper {
+      display: 'flex',
+      '& > *'; 
+  }
+ 
