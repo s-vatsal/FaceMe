@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 import json
 import os
 import pymongo
+from labelface import get_labels
 from bson.json_util import dumps
 
 app = Flask(__name__)
@@ -16,10 +17,6 @@ client = pymongo.MongoClient(uri)
 db = client.get_database('faceme')
 users_collection = db['users']
 faces_collections = db['faces']
-
-def get_labels(img):
-    return ["black hair", "glasses", "freckles"]
-
 
 @app.route('/api/items')
 def get_items():
@@ -36,6 +33,7 @@ def upload():
         return "No Image", 400
 
     image = request.files['image']
+    labels = get_labels(image)
     data = dict(request.form)
     print(data)
     print(data["img_url"][0])
@@ -46,7 +44,7 @@ def upload():
     obj = {
         'uid': 1,
         'filename': filename,
-        'labels': ['black hair', 'glasses', 'frekles'],
+        'labels': labels,
         'imageUrl': url,
     }
     print(obj)
