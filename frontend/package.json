@@ -14,6 +14,7 @@
     "@types/react-dom": "^17.0.0",
     "@types/react-router-dom": "^5.1.7",
     "firebase": "^8.3.1",
+    "material-ui-chip-input": "^2.0.0-beta.2",
     "material-ui-dropzone": "^3.5.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

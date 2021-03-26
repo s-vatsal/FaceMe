@@ -22,7 +22,8 @@ const SubmitCard: React.FC<Props> = ({faceName, labels, filename, imageUrl, key}
         style={{
             display: "flex",
             justifyContent: "space-between",
-            flexDirection: "column",
+                flexDirection: "column",
+                width: "300px" 
             }}
             key={key}
         >
@@ -30,7 +31,7 @@ const SubmitCard: React.FC<Props> = ({faceName, labels, filename, imageUrl, key}
                 {imageUrl ? (
                     <CardMedia
                         image={imageUrl}
-                        style={{ height: "300px", paddingTop: "2%", width: "1000px" }}
+                        style={{ height: "300px", paddingTop: "2%"}}
                         title={filename} />
                 ) : (
                     <CircularProgress />

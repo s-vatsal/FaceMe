@@ -17,8 +17,9 @@ db = client.get_database('faceme')
 users_collection = db['users']
 faces_collections = db['faces']
 
-def parse_json(data):
-    return dumps(data)
+def get_labels(img):
+    return ["black hair", "glasses", "freckles"]
+
 
 @app.route('/api/items')
 def get_items():
@@ -27,7 +28,7 @@ def get_items():
     faces = []
     for face in query:
         faces.append(face)
-    return parse_json(faces), 200
+    return dumps(faces), 200
 
 @app.route('/api/upload', methods=['POST'])
 def upload():
@@ -45,12 +46,28 @@ def upload():
     obj = {
         'uid': 1,
         'filename': filename,
-        'lables': ['brown_skinned'],
-        'img_url': url,
+        'labels': ['black hair', 'glasses', 'frekles'],
+        'imageUrl': url,
     }
     print(obj)
-    faces_collections.insert_one(obj)
-    return json.dumps(data), 200
+    return json.dumps(obj), 200
+
+@app.route('/api/submit_face', methods=['POST'])
+def submit_face():
+    data = dict(request.form)
+    print('POST', data)
+    labels = data['labels']
+    #labels = json.loads(data['labels'])
+    label = []
+    for string_label  in labels:
+        string_label = string_label.replace(']', '')
+        string_label = string_label.replace('[', '')
+        string_label = string_label.replace('\"', '')
+        label = string_label.split(',')
+    data['labels'] = label
+    #faces_collections.insert_one(obj)
+    return dumps(data), 200
+
 
 if __name__ == "__main__":
     # Quick test configuration. Please use proper Flask configuration options

@@ -1,36 +1,16 @@
 import React, {useState, useEffect} from 'react';
-import {Grid} from '@material-ui/core';
+import {Container, Grid, Tooltip, Typography} from '@material-ui/core';
 import NavBar from './components/nav';
-import { makeStyles } from '@material-ui/core/styles';
 import { apiUrl } from './constants';
-import FaceCard from './components/card';
+import SubmitCard from './components/submitCard';
 import AddIcon from '@material-ui/icons/Add';
 import Fab from '@material-ui/core/Fab';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    minWidth: 275,
-  },
-  bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
-  },
-  fab: {
-    margin: theme.spacing(2),
-    backgroundColor: "#1589FF"
-  },
-  title: {
-    fontSize: 14,
-  },
-  pos: {
-    marginBottom: 12,
-  },
-}));
+import styles from './css/faces.module.css';
+import { Link } from 'react-router-dom';
+import Face from './types/Face';
 
 const Home = () => {
-  const classes = useStyles();
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<Face[]>([]);
   useEffect(() => {
     fetch(apiUrl + "/items").then(data => {
         return data.json();
@@ -43,22 +23,37 @@ const Home = () => {
 }, []);
 
   return (
-    <div className={classes.root}>
+    <>
       <NavBar />
-      <Fab className={classes.fab} href="/create">
-          <AddIcon />
-        </Fab>
-      <Grid container justify="center" spacing={3} >
-
-        {items.map((item, index) => (
-          
-        <Grid item xs={3}>
-            <FaceCard labels={item.labels} filename={item.filename} imageUrl={item.img_url} key={index}/>
-        </Grid> 
-       ))}
-        </Grid>
+      <Container className={styles.container} maxWidth="md">
+        <div className={styles.topBox}>
+          <Tooltip title="Upload a new face" aria-label="Upload a new face">
+            <Link to="/create">
+              <Fab className={styles.fab} color="primary" aria-label="add">
+                <AddIcon/>
+              </Fab>
+            </Link>
+          </Tooltip>
+        </div>
+        <div className={styles.recommend}>
+        <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+            <Typography variant="h3">
+              <b>Your faces</b>
+          </Typography>
+          </div>
+          <Grid container alignItems="stretch" spacing={1}>
+            {items.map((face, index) => {
+              return (
+                <Grid item xs={12} md={3} style={{ display: "flex" }} key={index}>
+                  <SubmitCard faceName={face.faceName} imageUrl={face.imageUrl} filename={face.filename}  key={index} labels={face.labels} />
+                </Grid>
+              );
+            })}
+          </Grid>
+          </div>
+      </Container>
       
-    </div>
+    </>
   );
 }
 

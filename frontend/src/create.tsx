@@ -1,27 +1,26 @@
 import React, {useState} from 'react';
-import {Grid, Button, Container, Typography, CircularProgress} from '@material-ui/core';
+import {Grid, Button, Container, Typography, CircularProgress, TextField} from '@material-ui/core';
+import ChipInput from "material-ui-chip-input";
 import NavBar from './components/nav';
 import { apiUrl, storage} from './constants';
 import {DropzoneArea} from 'material-ui-dropzone'
 import styles from './css/upload.module.css';
-import FaceCard from './components/card'
+import Face from './types/Face'
+import SubmitCard from './components/submitCard';
+import { Link } from 'react-router-dom';
 
-  
-type View = "AWAITING" | "PROCESSING" | "RETURNED"
-
-interface FaceData {
-    filename: string,
-    imageUrl: string,
-    labels: string[],
-}
-
+type View = "AWAITING" | "PROCESSING"  | "RETURNED"| "EDITING" | "FINSIHED"
 
 const Create = () => {
     const [image, setImage] = useState<any>([])
     const [imageName, setImageName] = useState<string>('')
+    const [imageUrl, setImageUrl] = useState<string>('')
     const [view, setView] = useState<View>('AWAITING')
-    const [face, setFace] = useState<FaceData>()
-    
+    const [face, setFace] = useState<Face>()
+    const [faceName, setFaceName] = useState<string>('')
+    const [labels, setLabels] = useState <string []> ([''])
+    const [description, setDescription] = useState<string>('')
+
     const fileOnChange = (files: any) => {
         setImage(files[0]);
         if (files[0]) setImageName(files[0].name)
@@ -40,6 +39,7 @@ const Create = () => {
         }, async (): Promise<void>  => {
             const fireBaseUrl = await storage.ref('images').child(imageName).getDownloadURL()
             console.log(fireBaseUrl)
+            setImageUrl(fireBaseUrl)
             formData.append('img_url', fireBaseUrl)
             // @ts-ignore
             formData.append('image', image);
@@ -53,16 +53,55 @@ const Create = () => {
                 const resData = await response.json()
                 console.log(resData)
                 setFace({
+                    faceName: faceName,
                     filename: resData.filename,
                     imageUrl: fireBaseUrl,
                     labels: resData.labels
                 })
+                setLabels(resData.labels)
                 setView("RETURNED")
             } else {
                 setView("AWAITING")
             }
             });
     }
+    
+    const submitFinalImage = async (e:any): Promise<void> => {
+        e.preventDefault()
+        setView("EDITING")
+        let formData = new FormData()
+        formData.append('filename', imageName)
+        formData.append('labels', JSON.stringify(labels))
+        formData.append('imageUrl', imageUrl)
+        formData.append('faceName', faceName)
+        formData.append('description', description)
+        const response = await fetch(apiUrl + '/submit_face', {
+            method: "POST",
+            body: formData
+        });
+        if (response.ok) {
+            const resData = await response.json()
+            console.log(resData);
+            setView("FINSIHED")
+            window.location.href = "/"
+        } else {
+            setView("EDITING")
+        }
+    }
+    const handleNameChange = (e: any) => {
+        setFaceName(e.target.value)
+    }
+    const handleDescriptionChange = (e: any) => {
+        setDescription(e.target.value)
+    }
+    const handleLabelChange = (tags: any) => {
+        console.log(tags)
+        setLabels(tags)
+    }
+    
+      const handleLabelDelete = (labelToDelete: any) => () => {
+        setLabels((chips:any) => chips.filter((chip:any) => chip.key !== labelToDelete.key));
+      };
     return (
         <>
         <NavBar />
@@ -79,8 +118,8 @@ const Create = () => {
                         acceptedFiles={["image/jpeg", "image/png"]}
                         maxFileSize={5000000}
                         />
-                    <label htmlFor="contained-button-file">
-                    <Button variant="contained" color="primary" component="span" onClick={sendImage}>
+                            <label htmlFor="contained-button-file">
+                    <Button  variant="outlined" component="span" onClick={sendImage}>
                     Upload
                     </Button>
                     </label>   
@@ -98,24 +137,67 @@ const Create = () => {
                 )}
                 {view === "RETURNED" && (
                     <>
-                        
-                        <Grid
-                        container
-                        spacing={0}
-                        direction="column"
-                        alignItems="center"
-                        justify="center"
-                        style={{ minHeight: '100vh' }}
-                        >
-                        <Typography variant="h4" component="h4" className={styles.UploadHeader}>
-                            Here is your face
+                         <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+                            <Typography variant="h3">
+                            Here's what we found
                         </Typography>
-                        <Grid item xs={3}>
-                        
-                      <FaceCard filename={face?.filename || ''} imageUrl={face?.imageUrl|| ''} labels={face?.labels || ['']} key={1}/>
-                      </Grid>  
-                        </Grid> 
+                        </div>
+                        <form noValidate autoComplete="off" onSubmit={submitFinalImage}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} alignItems="center">
+                                <SubmitCard faceName={face?.faceName || ''} filename={face?.filename || ''} imageUrl={face?.imageUrl|| ''} labels={face?.labels || ['']} key={1}/>
+                                </Grid>
+                                <Grid item xs={12}>
+                                            <ChipInput
+                                        key={1}
+                                        helperText="Features"
+                                        id="Features"
+                                        defaultValue={labels}
+                                        onChange={(tags: any) => handleLabelChange(tags)}
+                                        className={styles.TagInput}
+                                        variant="outlined"
+                                        fullWidth
+                                        />
+                                </Grid>
+                            <Grid item xs={12}>
+                                        <TextField
+                                        autoFocus
+                                        margin="dense"
+                                        id="name"
+                                        label="Name of face"
+                                        type="text"
+                                        fullWidth
+                                        onChange={handleNameChange}
+                                        variant="outlined"
+                                        value={faceName}
+                                        required/>
+                            </Grid>
+                            <Grid item xs={12}>
+                            <TextField
+                                id="description"
+                                label="Description (<500 characters)"
+                                multiline
+                                fullWidth
+                                rows={5}
+                                variant="outlined"
+                                inputProps={{ maxLength: 500 }}
+                                value={description}
+                                error={description.length >= 500}
+                                onChange={handleDescriptionChange}
+                                required
+                                />
+                                </Grid>
+                                <Grid item xs={12}>
+                                <Button variant="outlined" type="submit">
+                                Publish
+                                </Button>
+                            </Grid>
+                            </Grid>
+                            </form>
                         </>
+                )}
+                {view === "EDITING" && (
+                   <CircularProgress/>
                 )}
                 </Container>
     </>
