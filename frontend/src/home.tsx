@@ -3,7 +3,7 @@ import {Grid} from '@material-ui/core';
 import NavBar from './components/nav';
 import { makeStyles } from '@material-ui/core/styles';
 import { apiUrl } from './constants';
-import PhonemeCard from './components/card';
+import FaceCard from './components/card';
 import AddIcon from '@material-ui/icons/Add';
 import Fab from '@material-ui/core/Fab';
 
@@ -54,7 +54,7 @@ const Home = () => {
         {items.map((item, index) => (
           
         <Grid item xs={3}>
-            <PhonemeCard phoneme={item.phoneme} filename={item.filename} imagePath={item.img_url} key={index}/>
+            <FaceCard labels={item.labels} filename={item.filename} imageUrl={item.img_url} key={index}/>
         </Grid> 
        ))}
         </Grid>

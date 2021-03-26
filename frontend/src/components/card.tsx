@@ -19,21 +19,19 @@ const useStyles = makeStyles({
 
 interface Props {
   filename: string,
-  imagePath: string,
-  phoneme: string,
+  imageUrl: string,
+  labels: string[],
   key: number
 }
 
-const PhonemeCards: React.FC<Props> = ({phoneme, filename, imagePath, key}) => {
+const FaceCard: React.FC<Props> = ({labels, filename, imageUrl, key}) => {
   const classes = useStyles();
-  const image = imagePath.replace("/Users/nishgowda/Desktop/Code/Projects/neuro_hack/frontend/public/", '../')
-  console.log(image)
   return (
     <Card className={classes.root} key={key}>
       <CardActionArea>
         <CardMedia
           className={classes.media}
-          image={image}
+          image={imageUrl}
           title={filename}
         />
         <CardContent>
@@ -41,7 +39,7 @@ const PhonemeCards: React.FC<Props> = ({phoneme, filename, imagePath, key}) => {
             {  filename }
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-          { phoneme }
+          { labels.join(' ') }
           </Typography>
         </CardContent>
       </CardActionArea>
@@ -56,4 +54,4 @@ const PhonemeCards: React.FC<Props> = ({phoneme, filename, imagePath, key}) => {
     </Card>
   );
 }
-export default PhonemeCards;
+export default FaceCard;

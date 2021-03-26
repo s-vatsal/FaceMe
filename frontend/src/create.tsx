@@ -4,24 +4,23 @@ import NavBar from './components/nav';
 import { apiUrl, storage} from './constants';
 import {DropzoneArea} from 'material-ui-dropzone'
 import styles from './css/upload.module.css';
-import PhonemeCard from './components/card'
+import FaceCard from './components/card'
 
   
 type View = "AWAITING" | "PROCESSING" | "RETURNED"
 
-interface Phoneme {
+interface FaceData {
     filename: string,
-    imagePath: string,
-    text: string[],
-    phoneme: string[],
+    imageUrl: string,
+    labels: string[],
 }
 
 
-const CreatePhoneme = () => {
+const Create = () => {
     const [image, setImage] = useState<any>([])
     const [imageName, setImageName] = useState<string>('')
     const [view, setView] = useState<View>('AWAITING')
-    const [phoneme, setPhoneme] = useState<Phoneme>()
+    const [face, setFace] = useState<FaceData>()
     const allInputs = {imgUrl: ''}
     const [imageAsUrl, setImageAsUrl] = useState(allInputs)
     
@@ -55,17 +54,14 @@ const CreatePhoneme = () => {
         const response = await fetch(apiUrl + '/upload', {
             method: "POST",
             body: formData,
-
         });
         if (response.ok) {
             const resData = await response.json()
             console.log(resData)
-            const imagePath = resData.path.replace("/Users/nishgowda/Desktop/Code/Projects/neuro_hack/frontend/public/", '../')
-            setPhoneme({
+            setFace({
                 filename: resData.filename,
-                imagePath: imagePath,
-                text: resData.text,
-                phoneme: resData.phoneme
+                imageUrl: imageAsUrl.imgUrl,
+                labels: resData.labels
             })
             setView("RETURNED")
         } else {
@@ -121,7 +117,7 @@ const CreatePhoneme = () => {
                         </Typography>
                         <Grid item xs={3}>
                         
-                      <PhonemeCard filename={phoneme?.filename || ''} imagePath={phoneme?.imagePath|| ''} phoneme={phoneme?.phoneme.join('')|| ''} key={1}/>
+                      <FaceCard filename={face?.filename || ''} imageUrl={face?.imageUrl|| ''} labels={face?.labels || ['']} key={1}/>
                       </Grid>  
                         </Grid> 
                         
@@ -134,4 +130,4 @@ const CreatePhoneme = () => {
     );
 }
 
-export default CreatePhoneme;
+export default Create;
