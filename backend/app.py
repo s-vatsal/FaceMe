@@ -4,20 +4,30 @@ from werkzeug.utils import secure_filename
 import json
 import os
 import pymongo
+from bson.json_util import dumps
 
 app = Flask(__name__)
 CORS(app)
-pword = "passowrd"
-connection_url = 'mongodb+srv://nishgowda:' + pword + '@cluster0.w5elw.mongodb.net/faceme?retryWrites=true&w=majority'
-print(connection_url)
-client = pymongo.MongoClient(connection_url)
+# Replace this with your username
+MONGO_USER = 'ngowda'
+uri = 'mongodb+srv://{}:faceme1234@cluster0.w5elw.mongodb.net/test?retryWrites=true&w=majority'.format(MONGO_USER)
+print(uri)
+client = pymongo.MongoClient(uri)
 db = client.get_database('faceme')
+users_collection = db['users']
+faces_collections = db['faces']
+
+def parse_json(data):
+    return dumps(data)
 
 @app.route('/api/items')
 def get_items():
     # get data from mongodb
-    data = []
-    return data, 200
+    query = faces_collections.find()
+    faces = []
+    for face in query:
+        faces.append(face)
+    return parse_json(faces), 200
 
 @app.route('/api/upload', methods=['POST'])
 def upload():
@@ -25,16 +35,21 @@ def upload():
         return "No Image", 400
 
     image = request.files['image']
-    url = request.form['img_url']
+    data = dict(request.form)
+    print(data)
+    print(data["img_url"][0])
+    url = data['img_url'][0]
     filename = secure_filename(image.filename)
     #  mimetype = image.mimetype
     ## DO STUFF WITH IMAGE HERE, CALL FUNCTIONS
-    data = {
+    obj = {
         'uid': 1,
         'filename': filename,
+        'lables': ['brown_skinned'],
         'img_url': url,
     }
-    db.faceme.insert_one(data)
+    print(obj)
+    faces_collections.insert_one(obj)
     return json.dumps(data), 200
 
 if __name__ == "__main__":

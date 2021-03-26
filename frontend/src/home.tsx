@@ -36,8 +36,7 @@ const Home = () => {
         return data.json();
     }).then(data => {
       console.log(data);
-      console.log(data)
-        setItems(data);
+      setItems(data);
     }).catch(err => {
         console.log(err)
     })

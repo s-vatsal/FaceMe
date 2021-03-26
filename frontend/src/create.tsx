@@ -21,52 +21,47 @@ const Create = () => {
     const [imageName, setImageName] = useState<string>('')
     const [view, setView] = useState<View>('AWAITING')
     const [face, setFace] = useState<FaceData>()
-    const allInputs = {imgUrl: ''}
-    const [imageAsUrl, setImageAsUrl] = useState(allInputs)
     
     const fileOnChange = (files: any) => {
         setImage(files[0]);
-        if (files[0])
-            setImageName(files[0].name)
+        if (files[0]) setImageName(files[0].name)
     }
-
     
-    const sendImage = async (e: any) : Promise<void> => {
+    const sendImage =  (e: any) => {
         setView("PROCESSING")
         let formData = new FormData();
-        const uploadTask = storage.ref('/images/' + imageName).put(image)
+        const uploadTask = storage.ref(`/images/${imageName}`).put(image)
+        //initiates the firebase side uploading 
+      
         uploadTask.on('state_changed', (snap) => {
             console.log(snap)
         }, (err) => {
             console.log(err)
-        }, () => {
-            storage.ref('images').child(imageName).getDownloadURL()
-                .then(fireBaseUrl => {
-                 setImageAsUrl(prevObject => ({...prevObject, imgUrl: fireBaseUrl}))
-                console.log('FIREBASE', fireBaseUrl)
-            })
-        })
-          // @ts-ignore
-        formData.append('image', image);
-        formData.append('img_url', imageAsUrl.imgUrl)
-        console.log(formData.get('img_url'))
-    
-        const response = await fetch(apiUrl + '/upload', {
-            method: "POST",
-            body: formData,
-        });
-        if (response.ok) {
-            const resData = await response.json()
-            console.log(resData)
-            setFace({
-                filename: resData.filename,
-                imageUrl: imageAsUrl.imgUrl,
-                labels: resData.labels
-            })
-            setView("RETURNED")
-        } else {
-            setView("AWAITING")
-        }
+        }, async (): Promise<void>  => {
+            const fireBaseUrl = await storage.ref('images').child(imageName).getDownloadURL()
+            console.log(fireBaseUrl)
+            formData.append('img_url', fireBaseUrl)
+            // @ts-ignore
+            formData.append('image', image);
+            console.log('IMGAGE_URL', formData.get('img_url'))
+        
+            const response = await fetch(apiUrl + '/upload', {
+                method: "POST",
+                body: formData,
+            });
+            if (response.ok) {
+                const resData = await response.json()
+                console.log(resData)
+                setFace({
+                    filename: resData.filename,
+                    imageUrl: fireBaseUrl,
+                    labels: resData.labels
+                })
+                setView("RETURNED")
+            } else {
+                setView("AWAITING")
+            }
+            });
     }
     return (
         <>
@@ -112,17 +107,14 @@ const Create = () => {
                         justify="center"
                         style={{ minHeight: '100vh' }}
                         >
-<Typography variant="h4" component="h4" className={styles.UploadHeader}>
-                            Here are the Phonemes found
+                        <Typography variant="h4" component="h4" className={styles.UploadHeader}>
+                            Here is your face
                         </Typography>
                         <Grid item xs={3}>
                         
                       <FaceCard filename={face?.filename || ''} imageUrl={face?.imageUrl|| ''} labels={face?.labels || ['']} key={1}/>
                       </Grid>  
                         </Grid> 
-                        
-                            
-                        
                         </>
                 )}
                 </Container>
