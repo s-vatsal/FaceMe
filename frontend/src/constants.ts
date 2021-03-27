@@ -1,5 +1,6 @@
 import firebase from 'firebase'
-const apiUrl = "http://localhost:5000/api"
+const apiUrl = "http://localhost:5000/"
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyDNDTBgStrrOqIDXoqU5oxd2z3jU6TRsI8",

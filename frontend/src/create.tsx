@@ -1,13 +1,11 @@
 import React, {useState} from 'react';
 import {Grid, Button, Container, Typography, CircularProgress, TextField} from '@material-ui/core';
 import ChipInput from "material-ui-chip-input";
-import NavBar from './components/nav';
 import { apiUrl, storage} from './constants';
 import {DropzoneArea} from 'material-ui-dropzone'
 import styles from './css/upload.module.css';
 import Face from './types/Face'
 import SubmitCard from './components/submitCard';
-import { Link } from 'react-router-dom';
 
 type View = "AWAITING" | "PROCESSING"  | "RETURNED"| "EDITING" | "FINSIHED"
 
@@ -56,7 +54,8 @@ const Create = () => {
                     faceName: faceName,
                     filename: resData.filename,
                     imageUrl: fireBaseUrl,
-                    labels: resData.labels
+                    labels: resData.labels,
+                    description: ''
                 })
                 setLabels(resData.labels)
                 setView("RETURNED")
@@ -99,12 +98,8 @@ const Create = () => {
         setLabels(tags)
     }
     
-      const handleLabelDelete = (labelToDelete: any) => () => {
-        setLabels((chips:any) => chips.filter((chip:any) => chip.key !== labelToDelete.key));
-      };
     return (
         <>
-        <NavBar />
             <Container className={styles.container}  maxWidth="md" >
                 {view === "AWAITING" && (
                     <>
@@ -145,12 +140,12 @@ const Create = () => {
                         <form noValidate autoComplete="off" onSubmit={submitFinalImage}>
                         <Grid container spacing={2}>
                             <Grid item xs={12} alignItems="center">
-                                <SubmitCard faceName={face?.faceName || ''} filename={face?.filename || ''} imageUrl={face?.imageUrl|| ''} labels={face?.labels || ['']} key={1}/>
+                                <SubmitCard faceName={face?.faceName || ''} filename={face?.filename || ''} imageUrl={face?.imageUrl|| ''} labels={ ['']} key={1}/>
                                 </Grid>
                                 <Grid item xs={12}>
                                             <ChipInput
                                         key={1}
-                                        helperText="Features"
+                                        label="Features"
                                         id="Features"
                                         defaultValue={labels}
                                         onChange={(tags: any) => handleLabelChange(tags)}

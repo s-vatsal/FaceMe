@@ -7,7 +7,7 @@ import {
     Typography,
     CircularProgress
 } from '@material-ui/core'
-
+import {Link } from 'react-router-dom'
 interface Props {
     filename: string,
     imageUrl: string,
@@ -18,24 +18,24 @@ interface Props {
   
 const SubmitCard: React.FC<Props> = ({faceName, labels, filename, imageUrl, key}) => {
     return (
+        <Link to={`/face/${filename}`} style={{ textDecoration: "none" }}>
         <Card
         style={{
             display: "flex",
             justifyContent: "space-between",
                 flexDirection: "column",
-                width: "300px" 
             }}
             key={key}
         >
-            <CardActionArea>
-                {imageUrl ? (
-                    <CardMedia
-                        image={imageUrl}
-                        style={{ height: "300px", paddingTop: "2%"}}
-                        title={filename} />
-                ) : (
-                    <CircularProgress />
-                )}
+           <CardActionArea>
+                <CardMedia
+            component="img"
+            alt={filename}
+                        height="300"
+                        width="300"
+            image={imageUrl}
+            title={filename}
+          /> 
             <CardContent>
                 <Typography variant="body2" style={{color: 'gray'}}>
                 <b>{faceName}</b> 
@@ -46,7 +46,8 @@ const SubmitCard: React.FC<Props> = ({faceName, labels, filename, imageUrl, key}
                     </Typography>
                 </CardContent>
             </CardActionArea>
-        </Card>
+            </Card>
+            </Link>
     )
 }
 export default SubmitCard
