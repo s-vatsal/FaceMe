@@ -139,7 +139,7 @@ const Create = () => {
                         </div>
                         <form noValidate autoComplete="off" onSubmit={submitFinalImage}>
                         <Grid container spacing={2}>
-                            <Grid item xs={12} alignItems="center">
+                        <Grid item xs={12} md={3} style={{ display: "flex" }} key={1}>
                                 <SubmitCard faceName={face?.faceName || ''} filename={face?.filename || ''} imageUrl={face?.imageUrl|| ''} labels={ ['']} key={1}/>
                                 </Grid>
                                 <Grid item xs={12}>

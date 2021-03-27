@@ -64,9 +64,10 @@ def upload():
 def face_feature(feature):
     print("FEATUIRE", feature)
     query = {'labels': feature}
-    obj  = faces_collections.find_one(query)
+    query  = faces_collections.find(query)
     faces = []
-    faces.append(obj)
+    for face in query:
+        faces.append(face)
     print(faces)
     return dumps(faces), 200
 
