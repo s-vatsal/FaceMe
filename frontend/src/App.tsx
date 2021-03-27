@@ -2,7 +2,7 @@ import React, { useState, useEffect} from 'react';
 import {BrowserRouter, Route, Switch } from 'react-router-dom';
 import Home from './home';
 import Create from './create';
-import { createMuiTheme, CssBaseline, ThemeProvider } from "@material-ui/core";
+import { CssBaseline, ThemeProvider } from "@material-ui/core";
 import { apiUrl } from './constants'
 import { useHistory } from "react-router-dom";
 import Header from './components/header';
@@ -12,16 +12,7 @@ import Search from './search';
 const App = () => {
   const history = useHistory();
 
-  const theme = createMuiTheme({
-    typography: {
-      fontFamily: [
-        "-apple-system",
-        "BlinkMacSystemFont",
-        '"Work Sans"',
-        '"Helvetica Neue"',
-      ].join(","),
-    },
-  });
+
   const [loggedIn, setLoggedIn] = useState(false);
   useEffect(() => {
     const access_token = localStorage.getItem("access_token");
@@ -39,7 +30,7 @@ const App = () => {
     }
   }, [loggedIn, history]);
   return (
-    <ThemeProvider theme={theme}>
+    <>
     <CssBaseline />
     <BrowserRouter>
           <Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
@@ -50,7 +41,7 @@ const App = () => {
           <Route path='/search/' component={Search} exact />
       </Switch>
       </BrowserRouter>
-      </ThemeProvider>
+      </>
   )
 }
 

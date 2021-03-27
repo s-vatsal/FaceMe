@@ -37,6 +37,7 @@ const Search = () => {
             })
         }
     }, [searchQuery])
+  
     const sendSearch = () => {
         if (searchQuery !== '') {
             fetch(apiUrl + '/face_facename/' + searchQuery).then(data => {
@@ -50,6 +51,7 @@ const Search = () => {
             })
         }
     }
+  
     const handleSearchChange = (e: any) => {
         console.log(e.target.value)
         setSearchQuery(e.target.value);
