@@ -6,20 +6,17 @@ import os
 import pymongo
 from labelface import get_labels
 from bson.json_util import dumps
-from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 
 from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 CORS(app)
-app.secret_key = 'super secret key'
-app.config['JWT_ACCESS_LIFESPAN'] = {'hours':24}
-app.config['JWT_REFRESH_LIFESPAN'] = {'days': 30}
-
-
-jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
+app.config['SECRET_KEY'] = 'top secret'
+app.config['JWT_ACCESS_LIFESPAN'] = {'hours': 24}
+app.config['JWT_REFRESH_LIFESPAN'] = {'days': 30}
+jwt = JWTManager(app)
 # Replace this with your username
 MONGO_USER = 'ngowda'
 uri = 'mongodb+srv://{}:faceme1234@cluster0.w5elw.mongodb.net/test?retryWrites=true&w=majority'.format(MONGO_USER)
@@ -29,9 +26,14 @@ users_collection = db['users']
 faces_collections = db['faces']
 
 @app.route('/faces')
+@jwt_required
 def get_items():
+    user_data = users_collection.find_one(
+    {"email": get_jwt_identity()})
+    if (user_data is None):
+        return jsonify(message="User not found"), 404
     # get data from mongodb
-    query = faces_collections.find()
+    query = faces_collections.find({'user': user_data['email']})
     faces = []
     for face in query:
         faces.append(face)
@@ -78,7 +80,12 @@ def face_features():
     return dumps(labels), 200
 
 @app.route('/submit_face', methods=['POST'])
+@jwt_required
 def submit_face():
+    user_data = users_collection.find_one({"email": get_jwt_identity()})
+    if (user_data is None):
+        return jsonify(message="User not found"), 404
+    
     data = dict(request.form)
     print('POST', data)
     labels = data['labels']
@@ -91,8 +98,7 @@ def submit_face():
         string_label = string_label.replace('\"', '')
         label.append(string_label)
     data['labels'] = label
-    data['user'] = 'nish.gowda6@gmail.com'
-    print(data)
+    data['user'] = user_data['email']
     faces_collections.insert_one(data)
     #faces_collections.insert_one(obj)
     return jsonify("Sucesfully submitted face"), 200
@@ -114,8 +120,9 @@ def fetch_face_facename(face_name):
     return dumps(faces), 200
 
 @app.route("/verify_access_token", methods=["GET"])
-@jwt_required()
+@jwt_required
 def verify_jwt():
+    print("sucess", get_jwt_identity())
     return jsonify(message="Good access token"), 200
 
 @app.route("/register", methods=["POST"])

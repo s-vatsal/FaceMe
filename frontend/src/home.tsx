@@ -8,32 +8,40 @@ import styles from './css/faces.module.css';
 import { Link } from 'react-router-dom';
 import Face from './types/Face';
 
-const Home = () => {
+type Props = {
+  loggedIn: boolean;
+};
+
+const Home: React.FC<Props> = ({ loggedIn }) => {
   const [items, setItems] = useState<Face[]>([]);
   const [featureFilter, setFeatureFilter] = useState('none');
   const [allLabels, setAllLables] = useState<string[]>(['']);
 
   useEffect(() => {
     if (featureFilter === "none") {
-      fetch(apiUrl + "/faces").then(data => {
+      const accessToken = localStorage.getItem("access_token");
+      const accessTokenString = 'Bearer ' + accessToken
+      fetch(apiUrl + "/faces", {
+        method: "GET",
+        headers: {
+          Authorization: accessTokenString
+        }
+      }).then(data => {
         return data.json();
-    }).then(data => {
-      console.log(data);
+    }).then(data => { 
       setItems(data);
     }).catch(err => {
         console.log(err)
     })
     }
     
-  }, [featureFilter]);
+  }, [featureFilter, loggedIn]);
   
   useEffect(() => {
-    console.log("FEATURE?", featureFilter);
     if (featureFilter !== "none") {
       fetch(apiUrl + '/face_feature/' + featureFilter).then(data => {
         return data.json()
       }).then(data => {
-        console.log(data)
         setItems(data);
       })
     }
@@ -43,7 +51,6 @@ const Home = () => {
     fetch(apiUrl + '/face_features').then(data => {
       return data.json();
     }).then(data => {
-      console.log(data);
       setAllLables(data);
     })
   }, [])

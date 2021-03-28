@@ -35,8 +35,11 @@ const App = () => {
     <BrowserRouter>
           <NavBar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
       <Switch>
-        <Route path="/" component={Home} exact />
-          <Route path="/create" component={Create} exact />
+          <Route path="/" exact>
+            <Home loggedIn={loggedIn}/></Route>
+          <Route path="/create" exact >
+            <Create isLoggedIn={loggedIn}/>
+            </Route>
           <Route path='/face/:faceName' component={ViewFace} exact />
           <Route path='/search/' component={Search} exact />
       </Switch>

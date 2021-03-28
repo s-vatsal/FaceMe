@@ -9,7 +9,10 @@ import FaceCard from './components/faceCard';
 
 type View = "AWAITING" | "PROCESSING"  | "RETURNED"| "EDITING" | "FINSIHED"
 
-const Create = () => {
+type Props = {
+    isLoggedIn: boolean;
+}
+const Create: React.FC<Props> = ({isLoggedIn }) => {
     const [image, setImage] = useState<any>([])
     const [imageName, setImageName] = useState<string>('')
     const [imageUrl, setImageUrl] = useState<string>('')
@@ -36,20 +39,16 @@ const Create = () => {
             console.log(err)
         }, async (): Promise<void>  => {
             const fireBaseUrl = await storage.ref('images').child(imageName).getDownloadURL()
-            console.log(fireBaseUrl)
             setImageUrl(fireBaseUrl)
             formData.append('img_url', fireBaseUrl)
             // @ts-ignore
-            formData.append('image', image);
-            console.log('IMGAGE_URL', formData.get('img_url'))
-        
+            formData.append('image', image);        
             const response = await fetch(apiUrl + '/upload', {
                 method: "POST",
                 body: formData,
             });
             if (response.ok) {
                 const resData = await response.json()
-                console.log(resData)
                 setFace({
                     faceName: faceName,
                     filename: resData.filename,
@@ -74,13 +73,16 @@ const Create = () => {
         formData.append('imageUrl', imageUrl)
         formData.append('faceName', faceName)
         formData.append('description', description)
+        const accessToken = localStorage.getItem("access_token");
+        const accessTokenString = 'Bearer ' + accessToken
         const response = await fetch(apiUrl + '/submit_face', {
             method: "POST",
-            body: formData
+            body: formData,
+            headers: {
+                Authorization: isLoggedIn ? accessTokenString: ''
+            }
         });
         if (response.ok) {
-            const resData = await response.json()
-            console.log(resData);
             setView("FINSIHED")
             window.location.href = "/"
         } else {
@@ -94,7 +96,6 @@ const Create = () => {
         setDescription(e.target.value)
     }
     const handleLabelChange = (tags: any) => {
-        console.log(tags)
         setLabels(tags)
     }
     
