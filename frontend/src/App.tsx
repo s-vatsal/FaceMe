@@ -2,10 +2,10 @@ import React, { useState, useEffect} from 'react';
 import {BrowserRouter, Route, Switch } from 'react-router-dom';
 import Home from './home';
 import Create from './create';
-import { CssBaseline, ThemeProvider } from "@material-ui/core";
+import { CssBaseline } from "@material-ui/core";
 import { apiUrl } from './constants'
 import { useHistory } from "react-router-dom";
-import Header from './components/header';
+import NavBar from './components/navBar';
 import ViewFace from './show';
 import Search from './search';
 
@@ -33,7 +33,7 @@ const App = () => {
     <>
     <CssBaseline />
     <BrowserRouter>
-          <Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+          <NavBar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
       <Switch>
         <Route path="/" component={Home} exact />
           <Route path="/create" component={Create} exact />

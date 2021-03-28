@@ -5,7 +5,7 @@ import { apiUrl, storage} from './constants';
 import {DropzoneArea} from 'material-ui-dropzone'
 import styles from './css/upload.module.css';
 import Face from './types/Face'
-import SubmitCard from './components/submitCard';
+import FaceCard from './components/faceCard';
 
 type View = "AWAITING" | "PROCESSING"  | "RETURNED"| "EDITING" | "FINSIHED"
 
@@ -140,7 +140,7 @@ const Create = () => {
                         <form noValidate autoComplete="off" onSubmit={submitFinalImage}>
                         <Grid container spacing={2}>
                         <Grid item xs={12} md={3} style={{ display: "flex" }} key={1}>
-                                <SubmitCard faceName={face?.faceName || ''} filename={face?.filename || ''} imageUrl={face?.imageUrl|| ''} labels={ ['']} key={1}/>
+                                <FaceCard faceName={face?.faceName || ''} filename={face?.filename || ''} imageUrl={face?.imageUrl|| ''} labels={ ['']} key={1}/>
                                 </Grid>
                                 <Grid item xs={12}>
                                             <ChipInput

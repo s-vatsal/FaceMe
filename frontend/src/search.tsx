@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import {Container, Grid, Typography, TextField, Button} from '@material-ui/core';
+import {Container, Grid, Typography, TextField} from '@material-ui/core';
 import { apiUrl } from './constants';
-import SubmitCard from './components/submitCard';
+import FaceCard from './components/faceCard';
 import styles from './css/faces.module.css';
 import Face from './types/Face';
 
@@ -19,13 +19,17 @@ const Search = () => {
     })
   }, []);
     
-    useEffect(() => {
-        if (searchQuery !== '') {
-            items.map((item) => {
-                if (item.faceName.includes(searchQuery)) {
-                    setItems([item])
+  useEffect(() => {
+
+    if (searchQuery !== '') {
+          const tempFaces:any = []
+      items.map((item) => {
+        let temp: string = item.faceName.toLowerCase();
+                if (temp.includes(searchQuery.toLowerCase())) {
+                  (tempFaces as any).push(item);
                 }
             })
+            setItems(tempFaces)
         } else {
             fetch(apiUrl + "/faces").then(data => {
                 return data.json();
@@ -38,19 +42,7 @@ const Search = () => {
         }
     }, [searchQuery])
   
-    const sendSearch = () => {
-        if (searchQuery !== '') {
-            fetch(apiUrl + '/face_facename/' + searchQuery).then(data => {
-                return data.json();
-            }).then(data => {
-                console.log(data);
-                if (data.length > 0)
-                    setItems(data);
-            }).catch(err => {
-                console.log(err);
-            })
-        }
-    }
+
   
     const handleSearchChange = (e: any) => {
         console.log(e.target.value)
@@ -70,7 +62,7 @@ const Search = () => {
                   
                   <Grid container alignItems="center" spacing={1}>
                       
-                      <Grid item xs={6}>
+                      <Grid item xs={12}>
                       <div>
                     <TextField
                     autoFocus
@@ -86,15 +78,10 @@ const Search = () => {
                           </div>
                           
                       </Grid>
-                      <Grid item xs={6}>
-                      <Button  variant="outlined" component="span" onClick={sendSearch}>
-                    Search
-                    </Button>
-                      </Grid>
                       {items.map((face, index) => {
               return (
                 <Grid item xs={12} md={3} style={{ display: "flex" }} key={index}>
-                  <SubmitCard faceName={face.faceName} imageUrl={face.imageUrl} filename={face.filename}  key={index} labels={['']} />
+                  <FaceCard faceName={face.faceName} imageUrl={face.imageUrl} filename={face.filename}  key={index} labels={['']} />
                 </Grid>
               );
             })}

@@ -18,6 +18,7 @@ import RegisterDialogue from "./registerDialogue";
 import LogoutButton from "./logoutButton";
 import styles from "../css/header.module.css";
 import Logo from '../assets/logo.png'
+
 const useStyles = makeStyles(() =>
   createStyles({
     root: {
@@ -104,11 +105,11 @@ const useStyles = makeStyles(() =>
 );
 
 type Props = {
-  readonly loggedIn: boolean;
-  readonly setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  loggedIn: boolean;
+  setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-function Nav({ loggedIn, setLoggedIn }: Props) {
+const NavBar = ({ loggedIn, setLoggedIn }: Props) => {
   const [inMobileView, setInMobileView] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const classes = useStyles();
@@ -257,4 +258,4 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
   return inMobileView ? displayMobile() : displayDesktop();
 }
 
-export default Nav;
+export default NavBar;

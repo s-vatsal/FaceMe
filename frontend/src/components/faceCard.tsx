@@ -5,7 +5,6 @@ import {
     CardContent,
     CardMedia,
     Typography,
-    CircularProgress
 } from '@material-ui/core'
 import {Link } from 'react-router-dom'
 interface Props {
@@ -16,7 +15,7 @@ interface Props {
     faceName: string
 }
   
-const SubmitCard: React.FC<Props> = ({faceName, labels, filename, imageUrl, key}) => {
+const FaceCard: React.FC<Props> = ({faceName, labels, filename, imageUrl, key}) => {
     return (
         <Link to={`/face/${filename}`} style={{ textDecoration: "none" }}>
         <Card
@@ -50,4 +49,4 @@ const SubmitCard: React.FC<Props> = ({faceName, labels, filename, imageUrl, key}
             </Link>
     )
 }
-export default SubmitCard
+export default FaceCard

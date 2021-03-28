@@ -11,16 +11,17 @@ import styles from "../css/siginform.module.css";
 import { apiUrl } from "../constants";
 
 type Props = {
-  readonly logged: React.Dispatch<React.SetStateAction<boolean>>;
-  readonly buttonClassName: string;
+  logged: React.Dispatch<React.SetStateAction<boolean>>;
+  buttonClassName: string;
 };
 
-export default function LoginDialog({ logged, buttonClassName }: Props) {
+const LoginDialog = ({ logged, buttonClassName }: Props) =>{
   const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [badLogin, setBadLogin] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [badLogin, setBadLogin] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -36,7 +37,7 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
       password: password,
     };
     setIsLoading(true);
-    fetch(`${apiUrl}/login`, {
+    fetch(apiUrl + '/login', {
       method: "POST",
       body: JSON.stringify(opts),
     })
@@ -113,3 +114,4 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
     </div>
   );
 }
+export default LoginDialog

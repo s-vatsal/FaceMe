@@ -3,11 +3,10 @@ import {Grid, Button, Container, Typography, Card, CardContent, TextField} from 
 import { apiUrl} from './constants';
 import styles from './css/upload.module.css';
 import Face from './types/Face'
-import SubmitCard from './components/submitCard';
+import FaceCard from './components/faceCard';
 
 const ViewFace = () => {
     const [face, setFace] = useState<Face>();
-
 
     useEffect(() => {
         let url = window.location.href
@@ -35,7 +34,7 @@ const ViewFace = () => {
                         </div>
                 <Grid container alignItems="stretch" spacing={1}>
                 <Grid item xs={12} md={3} style={{ display: "flex" }} key={1}>
-                                <SubmitCard faceName={face?.faceName || ''} filename={face?.filename || ''} imageUrl={face?.imageUrl|| ''} labels={ ['']} key={1}/>
+                                <FaceCard faceName={face?.faceName || ''} filename={face?.filename || ''} imageUrl={face?.imageUrl|| ''} labels={ ['']} key={1}/>
                          </Grid>
                             <Grid item xs={12}>
                                         <TextField

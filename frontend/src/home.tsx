@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Container, Grid, Tooltip, Typography, Card, CardContent} from '@material-ui/core';
 import { apiUrl } from './constants';
-import SubmitCard from './components/submitCard';
+import FaceCard from './components/faceCard';
 import AddIcon from '@material-ui/icons/Add';
 import Fab from '@material-ui/core/Fab';
 import styles from './css/faces.module.css';
@@ -10,11 +10,11 @@ import Face from './types/Face';
 
 const Home = () => {
   const [items, setItems] = useState<Face[]>([]);
-  const [featureFilter, setFeatureFilter] = useState('any');
+  const [featureFilter, setFeatureFilter] = useState('none');
   const [allLabels, setAllLables] = useState<string[]>(['']);
 
   useEffect(() => {
-    if (featureFilter === "any") {
+    if (featureFilter === "none") {
       fetch(apiUrl + "/faces").then(data => {
         return data.json();
     }).then(data => {
@@ -29,7 +29,7 @@ const Home = () => {
   
   useEffect(() => {
     console.log("FEATURE?", featureFilter);
-    if (featureFilter !== "any") {
+    if (featureFilter !== "none") {
       fetch(apiUrl + '/face_feature/' + featureFilter).then(data => {
         return data.json()
       }).then(data => {
@@ -48,10 +48,6 @@ const Home = () => {
     })
   }, [])
 
-  const handleFeatureFilterChange = (e: any) => {
-    console.log(e.target.value);
-    setFeatureFilter(e.target.value);
-  }
   return (
     <>
       <Container className={styles.container} maxWidth="md">
@@ -77,12 +73,12 @@ const Home = () => {
                         <u>Feature</u>
                       </Typography>
                     </Grid>
-                    {featureFilter !== "any" && (
+                    {featureFilter !== "none" && (
                       <Grid item xs={12}>
                         <b
                           style={{ cursor: "pointer", color: "gray" }}
                           onClick={(e) => {
-                            setFeatureFilter("any");
+                            setFeatureFilter("none");
                           }}
                         >
                           <u>Clear filter</u>
@@ -122,7 +118,7 @@ const Home = () => {
             {items.map((face, index) => {
               return (
                 <Grid item xs={12} md={3} style={{ display: "flex" }} key={index}>
-                  <SubmitCard faceName={face.faceName} imageUrl={face.imageUrl} filename={face.filename}  key={index} labels={['']} />
+                  <FaceCard faceName={face.faceName} imageUrl={face.imageUrl} filename={face.filename}  key={index} labels={['']} />
                 </Grid>
               );
             })}
