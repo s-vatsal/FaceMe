@@ -13,7 +13,7 @@ const App = () => {
   const history = useHistory();
 
 
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [isLoggedIn, setLoggedIn] = useState(false);
   useEffect(() => {
     const access_token = localStorage.getItem("access_token");
     if (access_token !== null) {
@@ -28,20 +28,22 @@ const App = () => {
     } else {
       setLoggedIn(false);
     }
-  }, [loggedIn, history]);
+  }, [isLoggedIn, history]);
   return (
     <>
     <CssBaseline />
     <BrowserRouter>
-          <NavBar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+          <NavBar loggedIn={isLoggedIn} setLoggedIn={setLoggedIn} />
       <Switch>
           <Route path="/" exact>
-            <Home loggedIn={loggedIn}/></Route>
+            <Home isLoggedIn={isLoggedIn}/></Route>
           <Route path="/create" exact >
-            <Create isLoggedIn={loggedIn}/>
+            <Create isLoggedIn={isLoggedIn}/>
             </Route>
           <Route path='/face/:faceName' component={ViewFace} exact />
-          <Route path='/search/' component={Search} exact />
+          <Route path='/search/' exact>
+            <Search isLoggedIn={isLoggedIn}/>
+            </Route>
       </Switch>
       </BrowserRouter>
       </>

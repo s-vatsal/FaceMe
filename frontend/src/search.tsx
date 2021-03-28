@@ -5,24 +5,36 @@ import FaceCard from './components/faceCard';
 import styles from './css/faces.module.css';
 import Face from './types/Face';
 
-const Search = () => {
-    const [items, setItems] = useState<Face[]>([]);
+type Props = {
+  isLoggedIn: boolean;
+}
+const Search: React.FC<Props> = ({ isLoggedIn }) => {
+  const [items, setItems] = useState<Face[]>([]);
+  const [originalFaces, setOriginalFaces] = useState<Face []>([])
     const [searchQuery, setSearchQuery] = useState<string>('');
-    useEffect(() => {
-    fetch(apiUrl + "/faces").then(data => {
+  
+  useEffect(() => {
+      const accessToken = localStorage.getItem("access_token");
+      const accessTokenString = 'Bearer ' + accessToken;
+      fetch(apiUrl + "/faces", {
+        method: "GET",
+        headers: {
+          Authorization: isLoggedIn ? accessTokenString : ''
+        }
+    }).then(data => {
         return data.json();
     }).then(data => {
-      console.log(data);
       setItems(data);
+      setOriginalFaces(data)
     }).catch(err => {
         console.log(err)
     })
   }, []);
-    
+
   useEffect(() => {
 
     if (searchQuery !== '') {
-          const tempFaces:any = []
+      const tempFaces: any = [];
       items.map((item) => {
         let temp: string = item.faceName.toLowerCase();
                 if (temp.includes(searchQuery.toLowerCase())) {
@@ -31,23 +43,14 @@ const Search = () => {
             })
             setItems(tempFaces)
         } else {
-            fetch(apiUrl + "/faces").then(data => {
-                return data.json();
-            }).then(data => {
-              console.log(data);
-              setItems(data);
-            }).catch(err => {
-                console.log(err)
-            })
+          setItems(originalFaces)
         }
     }, [searchQuery])
   
-
-  
     const handleSearchChange = (e: any) => {
-        console.log(e.target.value)
         setSearchQuery(e.target.value);
     }
+  
   return (
     <>
       <Container className={styles.container} maxWidth="md">

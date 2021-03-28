@@ -32,7 +32,6 @@ const Create: React.FC<Props> = ({isLoggedIn }) => {
         let formData = new FormData();
         const uploadTask = storage.ref(`/images/${imageName}`).put(image)
         //initiates the firebase side uploading 
-      
         uploadTask.on('state_changed', (snap) => {
             console.log(snap)
         }, (err) => {

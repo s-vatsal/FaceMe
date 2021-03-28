@@ -7,8 +7,10 @@ import pymongo
 from labelface import get_labels
 from bson.json_util import dumps
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
-
 from flask_bcrypt import Bcrypt
+from dotenv import load_dotenv
+load_dotenv()
+
 
 app = Flask(__name__)
 CORS(app)
@@ -18,9 +20,8 @@ app.config['JWT_ACCESS_LIFESPAN'] = {'hours': 24}
 app.config['JWT_REFRESH_LIFESPAN'] = {'days': 30}
 jwt = JWTManager(app)
 # Replace this with your username
-MONGO_USER = 'ngowda'
-uri = 'mongodb+srv://{}:faceme1234@cluster0.w5elw.mongodb.net/test?retryWrites=true&w=majority'.format(MONGO_USER)
-client = pymongo.MongoClient(uri)
+MONGO_URI = os.environ.get('MONGO_URI')
+client = pymongo.MongoClient(MONGO_URI)
 db = client.get_database('faceme')
 users_collection = db['users']
 faces_collections = db['faces']
@@ -47,8 +48,6 @@ def upload():
     image = request.files['image']
     labels = get_labels(image)
     data = dict(request.form)
-    print(data)
-    print(data["img_url"][0])
     url = data['img_url'][0]
     filename = secure_filename(image.filename)
     #  mimetype = image.mimetype
@@ -70,13 +69,11 @@ def face_feature(feature):
     faces = []
     for face in query:
         faces.append(face)
-    print(faces)
     return dumps(faces), 200
 
 @app.route('/face_features', methods=['GET'])
 def face_features():
     labels = faces_collections.distinct("labels")
-    print(labels)
     return dumps(labels), 200
 
 @app.route('/submit_face', methods=['POST'])
@@ -87,9 +84,7 @@ def submit_face():
         return jsonify(message="User not found"), 404
     
     data = dict(request.form)
-    print('POST', data)
     labels = data['labels']
-    #labels = json.loads(data['labels'])
     labels = labels.split(',')
     label = []
     for string_label  in labels:
@@ -100,7 +95,6 @@ def submit_face():
     data['labels'] = label
     data['user'] = user_data['email']
     faces_collections.insert_one(data)
-    #faces_collections.insert_one(obj)
     return jsonify("Sucesfully submitted face"), 200
 
 @app.route('/faces/<filename>')
@@ -108,7 +102,6 @@ def fetch_face(filename):
     print(filename)
     query_object = {'filename': filename}
     faces = faces_collections.find_one(query_object)
-    print("FACES", faces)
     return dumps(faces), 200
 
 @app.route('/face_facename/<face_name>')
@@ -116,13 +109,11 @@ def fetch_face_facename(face_name):
     print(face_name)
     query = {'faceName': face_name}
     faces = faces_collections.find_one(query)
-    print("faces", faces)
     return dumps(faces), 200
 
 @app.route("/verify_access_token", methods=["GET"])
 @jwt_required
 def verify_jwt():
-    print("sucess", get_jwt_identity())
     return jsonify(message="Good access token"), 200
 
 @app.route("/register", methods=["POST"])
@@ -164,14 +155,6 @@ def login():
         return jsonify(message="Bad Email or Password"), 401
 
 
-
-
-
-
 if __name__ == "__main__":
-    # Quick test configuration. Please use proper Flask configuration options
-    # in production settings, and use a separate file or environment variables
-    # to manage the secret key!
-
     app.debug = True
     app.run()

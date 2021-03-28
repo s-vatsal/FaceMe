@@ -9,10 +9,10 @@ import { Link } from 'react-router-dom';
 import Face from './types/Face';
 
 type Props = {
-  loggedIn: boolean;
+  isLoggedIn: boolean;
 };
 
-const Home: React.FC<Props> = ({ loggedIn }) => {
+const Home: React.FC<Props> = ({ isLoggedIn }) => {
   const [items, setItems] = useState<Face[]>([]);
   const [featureFilter, setFeatureFilter] = useState('none');
   const [allLabels, setAllLables] = useState<string[]>(['']);
@@ -24,7 +24,7 @@ const Home: React.FC<Props> = ({ loggedIn }) => {
       fetch(apiUrl + "/faces", {
         method: "GET",
         headers: {
-          Authorization: accessTokenString
+          Authorization: isLoggedIn ? accessTokenString : ''
         }
       }).then(data => {
         return data.json();
@@ -35,7 +35,7 @@ const Home: React.FC<Props> = ({ loggedIn }) => {
     })
     }
     
-  }, [featureFilter, loggedIn]);
+  }, [featureFilter, isLoggedIn]);
   
   useEffect(() => {
     if (featureFilter !== "none") {
@@ -67,71 +67,78 @@ const Home: React.FC<Props> = ({ loggedIn }) => {
             </Link>
           </Tooltip>
         </div>
-        <Grid container spacing={3}>
-            <Grid item xs={12} sm={3}>
-              <Card>
-                <CardContent>
-                  <Grid container spacing={1}>
+        {items.length > 1 && (
+          <Grid container spacing={3}>
+          <Grid item xs={12} sm={3}>
+            <Card>
+              <CardContent>
+                <Grid container spacing={1}>
+                  <Grid item xs={12}>
+                    <Typography variant="h4">Filter</Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography>
+                      <u>Feature</u>
+                    </Typography>
+                  </Grid>
+                  {featureFilter !== "none" && (
                     <Grid item xs={12}>
-                      <Typography variant="h4">Filter</Typography>
+                      <b
+                        style={{ cursor: "pointer", color: "gray" }}
+                        onClick={(e) => {
+                          setFeatureFilter("none");
+                        }}
+                      >
+                        <u>Clear filter</u>
+                      </b>
                     </Grid>
-                    <Grid item xs={12}>
-                      <Typography>
-                        <u>Feature</u>
-                      </Typography>
-                    </Grid>
-                    {featureFilter !== "none" && (
-                      <Grid item xs={12}>
+                  )}
+                 {allLabels.map((label) => {
+                    return (
+                      <Grid item xs={12} key={label}>
                         <b
-                          style={{ cursor: "pointer", color: "gray" }}
+                          style={{ cursor: "pointer" }}
                           onClick={(e) => {
-                            setFeatureFilter("none");
+                            setFeatureFilter(label);
                           }}
                         >
-                          <u>Clear filter</u>
+                          {label === featureFilter && "- "}
+                          {label}
                         </b>
                       </Grid>
-                    )}
-                   {allLabels.map((label) => {
-                      return (
-                        <Grid item xs={12} key={label}>
-                          <b
-                            style={{ cursor: "pointer" }}
-                            onClick={(e) => {
-                              setFeatureFilter(label);
-                            }}
-                          >
-                            {label === featureFilter && "- "}
-                            {label}
-                          </b>
-                        </Grid>
-                      );
-                    })}
-                      
-                  </Grid>
-                </CardContent>
-              </Card>
-          </Grid>
-          <Grid item xs={12} sm={9}>
-          <div className={styles.recommend}>
-        <div style={{ marginTop: "5px", marginBottom: "5px" }}>
-            <Typography variant="h3">
-              <b>Your faces</b>
-          </Typography>
-              </div>
-              </div>
-          <Grid container alignItems="stretch" spacing={1}>
-         
-            {items.map((face, index) => {
-              return (
-                <Grid item xs={12} md={3} style={{ display: "flex" }} key={index}>
-                  <FaceCard faceName={face.faceName} imageUrl={face.imageUrl} filename={face.filename}  key={index} labels={['']} />
+                    );
+                  })}
+                    
                 </Grid>
-              );
-            })}
+              </CardContent>
+            </Card>
+        </Grid>
+        <Grid item xs={12} sm={9}>
+        <div className={styles.recommend}>
+      <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+          <Typography variant="h3">
+            <b>Your faces</b>
+        </Typography>
+            </div>
+            </div>
+        <Grid container alignItems="stretch" spacing={1}>
+       
+          {items.map((face, index) => {
+            return (
+              <Grid item xs={12} md={3} style={{ display: "flex" }} key={index}>
+                <FaceCard faceName={face.faceName} imageUrl={face.imageUrl} filename={face.filename}  key={index} labels={['']} />
+              </Grid>
+            );
+          })}
+        </Grid>
+        </Grid>
           </Grid>
-          </Grid>
-            </Grid>
+        )}
+        {items.length < 1 && (
+          <Typography variant="h3">
+              You have no faces saved yet
+          </Typography>
+        )}
       </Container>
       
     </>
